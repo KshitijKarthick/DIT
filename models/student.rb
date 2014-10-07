@@ -8,7 +8,7 @@ class Student
 	property :dob, Date, :required => true, :message => 'Correct Format of DOB should be entered yyyy/dd/mm'
 	property :section, String, :required => true, :message => 'Student should have a valid Section'
 	property :semester, Integer, :required => true, :message => 'Student should be enrolled under a semester'
-	property :sex, Flag[:m,:f],:required => true, :message => 'Student should have either m or f as the sex.'
+	property :sex, String,:required => true, :message => 'Student should have either m or f as the sex.'
 
 	belongs_to :course, 'Course',
 		:parent_key => [:id],
