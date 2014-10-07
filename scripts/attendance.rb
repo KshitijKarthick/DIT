@@ -2,7 +2,7 @@ require 'bundler'
 Bundler.require
 require_relative '../dm_config'
 require_relative 'import.rb'
-$validStudent=Array.new
+$validAttendance=Array.new
 def dataImport
   puts ""
   puts "Attendance:"
@@ -24,14 +24,15 @@ def dataImport
     year=data[clean 'Year']
     srn=data[clean 'Srn']
     classes_held=data[clean 'Classes Held']
-    classes_attend=data[clean 'Classes Attend']
+    classes_attended=data[clean 'Classes Attended']
+    semester = data[clean 'Semester']
 
-    student=Student.get(:srn=>srn)
+    student=Student.first(:srn=>srn)
     if !student
       return "SRN #{srn} on row #{index} does not exist"
     end
 
-    if !Faculty.get(:id => faculty_id)
+    if !faculty=Faculty.first(:id => faculty_id)
       return "Faculty with faculty id #{faculty_id} on row #{index} does not exist"
     end
 
@@ -48,8 +49,8 @@ def dataImport
       lecture.department=student.department
       lecture.faculty=faculty
       lecture.subject=subject
-      if !lecture.valid
-        return error_concat(lecture)
+      if !lecture.valid?
+        return error_concat(lecture,index)
       end
       lecture.save
     end
@@ -59,33 +60,33 @@ def dataImport
       enrollment=Enrollment.new
       enrollment.student=student
       enrollment.lectureseries=lecture
-      if enrollment.valid
+      if enrollment.valid?
         enrollment.save
       else
-        return error_concat(enrollment)
+        return error_concat(enrollment,index)
       end
     end
 
     weeklyattendance=WeeklyAttendance.new(:week_number=>week_no,:classes_held=>classes_held,:classes_attended=>classes_attended)
     weeklyattendance.student=student
     weeklyattendance.lectureseries=lecture
-    if weeklyattendance.valid
-      SaneData.push weeklyattendance
+    if weeklyattendance.valid?
+      $validAttendance.push weeklyattendance
     else
-      return error_concat(weeklyattendance)
+      return error_concat(weeklyattendance,index)
     end
   end
   return nil
 end
 def save
-  SaneData.each do |data|
+  $validAttendance.each do |data|
     data.save
   end
 end
-def error_concat(obj)
-  e = "The following errors were encountered\n"
+def error_concat(obj,row)
+  e = "The following errors were encountered on row #{row}\n"
   obj.errors.each do |error|
-    e+="\n"+error
+    e+="\n"+error.join("")
   end
   e+="\n"+"None of the Records were saved."
   return e
