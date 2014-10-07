@@ -3,6 +3,7 @@ class LectureSeries
 	property :id, Serial,:message => 'Primary Key should be Unique'
 	property :year, Date
 	property :section, String, :length => 5,:message =>'Section data should not have greater length than 5'
+	property :semester, Integer
 
 	belongs_to :course, 'Course',
 	:parent_key => [:id],
