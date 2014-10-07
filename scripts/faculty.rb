@@ -2,25 +2,45 @@ require 'bundler'
 Bundler.require
 require_relative 'import.rb'
 require_relative '../dm_config'
-Faculty_Data=DDImporter.new('../excel/Faculty.xlsx')
-Faculty_Data.open
-Faculty_Data.extract('Sheet1')
-dataImport=Faculty_Data.data_collection
-for data in dataImport
-  name = data['Faculty Name'.chomp.downcase.strip].chomp.downcase.strip
-  phone_number = data['Phone Number'.chomp.downcase.strip].to_s.chomp.downcase.strip[/[0-9]*/]
-  f = Faculty.first(:name => name,:phone_number => phone_number)
-  if !f
-    f = Faculty.new(:name => name,:phone_number => phone_number)
-    if f.valid?
-      f.save
-    else
-      puts "Data is invalid"
-      s.errors.each do |error|
-        puts error
+$validFaculty=Array.new
+def dataImport
+  puts ""
+  puts "Faculty:"
+  path=ARGV[1]
+  if path == nil
+    path='../excel/Faculty.xlsx'
+    puts"Default Path has been considered :"+path
+  end
+  faculty_Data=DDImporter.new(path)
+  faculty_Data.open
+  faculty_Data.extract('Sheet1')
+  dataImport=faculty_Data.data_collection
+  for data in dataImport
+    name = data[clean('Faculty Name')]
+    phone_number = data[clean('Phone Number')]
+    f = Faculty.first(:name => name,:phone_number => phone_number)
+    if !f
+      f = Faculty.new(:name => name,:phone_number => phone_number)
+      if f.valid?
+        $validFaculty.push f
+      else
+        return error_concat(f)
       end
-      puts "Please rerun all data entries from the specified data for Successfull data storage."
-      break
     end
   end
+  return nil
 end
+def save
+  $validFaculty.each do |data|
+    data.save
+  end
+end
+def error_concat(obj)
+  e = "The following errors were encountered\n"
+  obj.errors.each do |error|
+    e+="\n"+error
+  end
+  e+="\n"+"None of the Records were saved."
+  return e
+end
+
