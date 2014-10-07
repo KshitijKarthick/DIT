@@ -1,5 +1,0 @@
-require_relative 'course.rb'
-require_relative 'department.rb'
-require_relative 'faculty.rb'
-require_relative 'student.rb'
-require_relative 'subject.rb'
