@@ -2,7 +2,7 @@ require 'bundler'
 Bundler.require
 require_relative '../dm_config'
 require_relative 'import.rb'
-$validCourse=Array.new
+$validMarks=Array.new
 
 def dataImport
 puts ""
@@ -16,7 +16,6 @@ marks_Data=DDImporter.new(path)
 marks_Data.open
 marks_Data.extract('Sheet1')
 dataImport=marks_Data.data_collection
-
 dataImport.each_with_index do |data,index|
   #Sanitizing spreadsheet row
   exam_date=data[clean 'Exam Date']
@@ -32,12 +31,12 @@ dataImport.each_with_index do |data,index|
   max_marks=data[clean 'Maximum Marks']
   marks_obtained=data[clean 'Marks Obtained']
 
-  student=Student.get(:srn=>srn)
+  student=Student.first(:srn=>srn)
   if !student
     return "SRN #{srn} on row #{index} does not exist"
   end
 
-  if !Faculty.get(:id => faculty_id)
+  if !faculty=Faculty.first(:id => faculty_id)
     return "Faculty with faculty id #{faculty_id} on row #{index} does not exist"
   end
 
@@ -54,7 +53,7 @@ dataImport.each_with_index do |data,index|
     lecture.department=student.department
     lecture.faculty=faculty
     lecture.subject=subject
-    if !lecture.valid
+    if !lecture.valid?
       return error_concat(lecture)
     end
     lecture.save
@@ -65,7 +64,7 @@ dataImport.each_with_index do |data,index|
     enrollment=Enrollment.new
     enrollment.student=student
     enrollment.lectureseries=lecture
-    if enrollment.valid
+    if enrollment.valid?
       enrollment.save
     else
       return error_concat(enrollment)
@@ -76,7 +75,7 @@ dataImport.each_with_index do |data,index|
   if !exam
     exam=Exam.new(:date=>exam_date, :name=> exam_name, :type=>exam_type,:min_marks=>min_marks,:max_marks=>max_marks)
     exam.lectureseries=lecture
-    if exam.valid
+    if exam.valid?
       exam.save
     else
       return error_concat(exam)
@@ -86,7 +85,7 @@ dataImport.each_with_index do |data,index|
   score=Score.new(:marks_obtained=>marks_obtained)
   score.student=student
   score.exam=exam
-  if score.valid
+  if score.valid?
     $validMarks.push score
   else
     return error_concat(score)
@@ -94,15 +93,17 @@ dataImport.each_with_index do |data,index|
 end
 return nil
 end
+
 def save
   $validMarks.each do |data|
     data.save
   end
 end
+
 def error_concat(obj)
   e = "The following errors were encountered\n"
   obj.errors.each do |error|
-    e+="\n"+error
+    e+="\n"+error.join("")
   end
   e+="\n"+"None of the Records were saved."
   return e

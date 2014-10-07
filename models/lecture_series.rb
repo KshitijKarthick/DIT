@@ -1,7 +1,7 @@
 class LectureSeries
 	include DataMapper::Resource
 	property :id, Serial,:message => 'Primary Key should be Unique'
-	property :year, Date
+	property :year, String
 	property :section, String, :length => 5,:message =>'Section data should not have greater length than 5'
 	property :semester, Integer
 
