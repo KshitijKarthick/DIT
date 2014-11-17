@@ -26,15 +26,16 @@ class DDImporter
 end
 
 def clean(data)
-  if data.class == Date
-    return data
-  end
   if data.class == String
     return data.chomp.downcase.strip
   elsif data.class == Fixnum
     return data.to_s.chomp.downcase.strip
   elsif data.class == Float
-      return data.to_i
+      if data.round == data 
+        return data.round
+      else
+        return data
+      end
     #elsif data.class == NilClass
     #  return ''
     #
