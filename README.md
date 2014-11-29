@@ -6,6 +6,8 @@
    * Each Ruby Script is Atomic and can be run Independently.
    * Stores all the Data managed in a Database from the Excel Sheet.
   
+![Image](/img/mainWindow.png "GUI Interface")
+
 ## Program Details :
    * Program is written in Ruby.
    * Implements ORM in the Program to map it into the Database.
@@ -28,6 +30,14 @@
       * ruby program.rb all
 
 ```
+
+## Working :
+  * Import Operation for Course Table 
+
+![Image](/img/working1.png "Import Operation for Course Table")
+  * Import Operation for All Tables
+
+![Image](/img/working2.png "Import Operation for All Tables")
 
 ## To Do :
   * Add Generic Features for the Data Import Tool.
