@@ -68,7 +68,7 @@ GEM
       racc (~> 1.4)
     pg (0.17.1)
     racc (1.6.0)
-    rack (1.5.2)
+    rack (1.6.13)
     rack-protection (1.5.3)
       rack
     roo (1.13.2)
