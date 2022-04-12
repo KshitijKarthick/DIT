@@ -76,7 +76,7 @@ GEM
       rubyzip
       spreadsheet (> 0.6.4)
     ruby-ole (1.2.11.7)
-    rubyzip (1.1.6)
+    rubyzip (2.3.2)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
